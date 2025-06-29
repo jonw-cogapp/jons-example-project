@@ -1,0 +1,14 @@
+name: Smoke
+on:
+  repository_dispatch:
+    types: [post_deploy_complete]
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say Hello
+        run: |
+          echo "🎉 Deployment succeeded!"
+          echo "Environment: ${{ github.event.deployment.environment }}"
+          echo "Environment URL: ${{ github.event.deployment_status.environment_url }}"
