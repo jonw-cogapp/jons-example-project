@@ -6,6 +6,9 @@ on:
 jobs:
   say-hello:
     runs-on: ubuntu-latest
+    if: >
+      github.event.client_payload.branch &&
+      github.event.client_payload.branch == github.ref_name
     steps:
       - name: Say Hello
         run: |
