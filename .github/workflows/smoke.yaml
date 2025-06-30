@@ -21,6 +21,10 @@ jobs:
           echo "Environment URL: ${{ github.event.client_payload.hostname }}"
   test:
     runs-on: ubuntu-latest
+    env:
+      HTTP_AUTH_USER: ${{ secrets.HTTP_AUTH_USER }}
+      HTTP_AUTH_PASSWORD: ${{ secrets.HTTP_AUTH_PASSWORD }}
+      HOSTNAME: ${{ github.event.client_payload.hostname }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
