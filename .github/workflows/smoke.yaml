@@ -4,27 +4,24 @@ on:
     types: [post_deploy_complete]
 
 jobs:
-  say-hello:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Output payload
+        run: |
+          echo "Received repository dispatch event with payload:"
+          echo "Branch: ${{ github.event.client_payload.branch }}"
+          echo "Environment hostname: ${{ github.event.client_payload.hostname }}"
+  test:
     runs-on: ubuntu-latest
     env:
-      HTTP_AUTH_USER: ${{ secrets.HTTP_AUTH_USER }}
-      HTTP_AUTH_PASSWORD: ${{ secrets.HTTP_AUTH_PASSWORD }}
+      # Extract env variables from the client payload
+      HTTP_AUTH_USER: ${{ github.event.client_payload.http_auth_user }}
+      HTTP_AUTH_PASSWORD: ${{ github.event.client_payload.http_auth_password }}
       HOSTNAME: ${{ github.event.client_payload.hostname }}
     if: >
       github.event.client_payload.branch == 'main' ||
       github.event.client_payload.branch == 'develop'
-    steps:
-      - name: Say Hello
-        run: |
-          echo "🎉 Deployment succeeded!"
-          echo "Environment: ${{ github.event.client_payload.branch }}"
-          echo "Environment URL: ${{ github.event.client_payload.hostname }}"
-  test:
-    runs-on: ubuntu-latest
-    env:
-      HTTP_AUTH_USER: ${{ secrets.HTTP_AUTH_USER }}
-      HTTP_AUTH_PASSWORD: ${{ secrets.HTTP_AUTH_PASSWORD }}
-      HOSTNAME: ${{ github.event.client_payload.hostname }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
