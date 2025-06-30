@@ -6,6 +6,10 @@ on:
 jobs:
   say-hello:
     runs-on: ubuntu-latest
+    env:
+      HTTP_AUTH_USER: ${{ secrets.HTTP_AUTH_USER }}
+      HTTP_AUTH_PASSWORD: ${{ secrets.HTTP_AUTH_PASSWORD }}
+      HOSTNAME: ${{ github.event.client_payload.hostname }}
     if: >
       github.event.client_payload.branch == 'main' ||
       github.event.client_payload.branch == 'develop'
@@ -13,5 +17,26 @@ jobs:
       - name: Say Hello
         run: |
           echo "🎉 Deployment succeeded!"
-          echo "Environment: ${{ github.event.deployment.environment }}"
-          echo "Environment URL: ${{ github.event.deployment_status.environment_url }}"
+          echo "Environment: ${{ github.event.client_payload.branch }}"
+          echo "Environment URL: ${{ github.event.client_payload.hostname }}"
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/jod
+    
+    steps:
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      run: npx playwright test
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
